@@ -127,3 +127,28 @@ def test_ac7_reject_bad_input(tmp_path):
         )
         count = conn.execute("SELECT COUNT(*) FROM links").fetchone()[0]
     assert count == 0
+
+
+def test_ac8_persist_across_restart(tmp_path):
+    """AC8: same DB file + new create_app → redirect + prior visits survive."""
+    from app import create_app
+
+    db_path = str(tmp_path / "test.sqlite")
+    app = create_app({"TESTING": True, "DATABASE": db_path})
+    client = app.test_client()
+
+    create = client.post("/links", json={"url": EXAMPLE_URL})
+    assert 200 <= create.status_code < 300
+    code = create.get_json()["code"]
+    assert client.get(f"/{code}").status_code in (301, 302)
+
+    restarted = create_app({"TESTING": True, "DATABASE": db_path})
+    client2 = restarted.test_client()
+
+    stats = client2.get(f"/links/{code}/stats")
+    assert stats.status_code == 200
+    assert stats.get_json()["visits"] == 1
+
+    response = client2.get(f"/{code}")
+    assert response.status_code in (301, 302)
+    assert response.headers["Location"] == EXAMPLE_URL
