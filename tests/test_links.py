@@ -1,6 +1,7 @@
 """TH-1 acceptance tests — one failing def at a time (TDD)."""
 
-EXAMPLE_URL = "https://example.com/path"
+# Typical shortener-demo long URL (Wikipedia “URL shortening” article).
+EXAMPLE_URL = "https://en.wikipedia.org/wiki/URL_shortening"
 
 
 def test_health(tmp_path):
@@ -174,8 +175,12 @@ def test_ac9_unique_codes(tmp_path):
     app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
     client = app.test_client()
 
-    first = client.post("/links", json={"url": "https://example.com/one"})
-    second = client.post("/links", json={"url": "https://example.com/two"})
+    first = client.post(
+        "/links", json={"url": "https://en.wikipedia.org/wiki/URL_shortening"}
+    )
+    second = client.post(
+        "/links", json={"url": "https://en.wikipedia.org/wiki/HTTP"}
+    )
 
     assert 200 <= first.status_code < 300
     assert 200 <= second.status_code < 300

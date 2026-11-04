@@ -36,16 +36,16 @@ curl -s http://127.0.0.1:5000/health
 # Create
 curl -s -X POST http://127.0.0.1:5000/links \
   -H 'Content-Type: application/json' \
-  -d '{"url":"https://example.com/path"}'
-# → {"code":"Ab12Cd34","url":"https://example.com/path"}
+  -d '{"url":"https://en.wikipedia.org/wiki/URL_shortening"}'
+# → {"code":"Ab12Cd34","url":"https://en.wikipedia.org/wiki/URL_shortening"}
 
 # Redirect (follow with -L, or inspect headers)
 curl -sI http://127.0.0.1:5000/Ab12Cd34
-# → 302 Location: https://example.com/path
+# → 302 Location: https://en.wikipedia.org/wiki/URL_shortening
 
 # Stats
 curl -s http://127.0.0.1:5000/links/Ab12Cd34/stats
-# → {"code":"Ab12Cd34","url":"https://example.com/path","visits":1}
+# → {"code":"Ab12Cd34","url":"https://en.wikipedia.org/wiki/URL_shortening","visits":1}
 ```
 
 ## Design notes
