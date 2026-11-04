@@ -60,3 +60,25 @@ def test_ac3_visit_tracking(tmp_path):
     stats_again = client.get(f"/links/{code}/stats")
     assert stats_again.status_code == 200
     assert stats_again.get_json()["visits"] == 2
+
+
+def test_ac4_stats_for_known_code(tmp_path):
+    """AC4: GET /links/{code}/stats → 200 with url/code + numeric visits."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    create = client.post("/links", json={"url": EXAMPLE_URL})
+    assert 200 <= create.status_code < 300
+    code = create.get_json()["code"]
+
+    response = client.get(f"/links/{code}/stats")
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data is not None
+    assert data.get("code") == code or data.get("url") == EXAMPLE_URL
+    assert "visits" in data
+    assert isinstance(data["visits"], int)
+    assert data["visits"] == 0
