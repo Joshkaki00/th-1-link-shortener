@@ -104,3 +104,26 @@ def test_ac6_unknown_stats_404(tmp_path):
 
     response = client.get("/links/nope/stats")
     assert response.status_code == 404
+
+
+def test_ac7_reject_bad_input(tmp_path):
+    """AC7: empty/missing/not-a-url → 4xx and no mapping stored."""
+    import sqlite3
+
+    from app import create_app
+
+    db_path = tmp_path / "test.sqlite"
+    app = create_app({"TESTING": True, "DATABASE": str(db_path)})
+    client = app.test_client()
+
+    for body in ({}, {"url": ""}, {"url": "not-a-url"}):
+        response = client.post("/links", json=body)
+        assert 400 <= response.status_code < 500
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS links ("
+            "code TEXT PRIMARY KEY, url TEXT NOT NULL, visits INTEGER NOT NULL DEFAULT 0)"
+        )
+        count = conn.execute("SELECT COUNT(*) FROM links").fetchone()[0]
+    assert count == 0
