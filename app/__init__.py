@@ -18,4 +18,8 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path, exist_ok=True)
     except OSError:
         pass
+
+    from .routes import create_link
+
+    app.add_url_rule("/links", view_func=create_link, methods=["POST"])
     return app
