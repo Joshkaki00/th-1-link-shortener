@@ -37,3 +37,26 @@ def test_ac2_redirect(tmp_path):
 
     assert response.status_code in (301, 302)
     assert response.headers["Location"] == EXAMPLE_URL
+
+
+def test_ac3_visit_tracking(tmp_path):
+    """AC3: two redirects → visits==2; stats GET must not increment."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    create = client.post("/links", json={"url": EXAMPLE_URL})
+    assert 200 <= create.status_code < 300
+    code = create.get_json()["code"]
+
+    assert client.get(f"/{code}").status_code in (301, 302)
+    assert client.get(f"/{code}").status_code in (301, 302)
+
+    stats = client.get(f"/links/{code}/stats")
+    assert stats.status_code == 200
+    assert stats.get_json()["visits"] == 2
+
+    stats_again = client.get(f"/links/{code}/stats")
+    assert stats_again.status_code == 200
+    assert stats_again.get_json()["visits"] == 2
