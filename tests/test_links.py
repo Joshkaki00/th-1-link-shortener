@@ -82,3 +82,14 @@ def test_ac4_stats_for_known_code(tmp_path):
     assert "visits" in data
     assert isinstance(data["visits"], int)
     assert data["visits"] == 0
+
+
+def test_ac5_unknown_redirect_404(tmp_path):
+    """AC5: GET /nope with no mapping → 404."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    response = client.get("/nope")
+    assert response.status_code == 404
