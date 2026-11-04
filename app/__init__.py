@@ -19,8 +19,11 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from .routes import create_link, redirect_code
+    from .routes import create_link, link_stats, redirect_code
 
     app.add_url_rule("/links", view_func=create_link, methods=["POST"])
+    app.add_url_rule(
+        "/links/<code>/stats", view_func=link_stats, methods=["GET"]
+    )
     app.add_url_rule("/<code>", view_func=redirect_code, methods=["GET"])
     return app

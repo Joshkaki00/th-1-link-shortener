@@ -55,3 +55,19 @@ def redirect_code(code):
         conn.commit()
         url = row[0]
     return redirect(url, code=302)
+
+
+def link_stats(code):
+    """GET /links/<code>/stats — visit count without incrementing (AC3/AC4)."""
+    db_path = current_app.config["DATABASE"]
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS links ("
+            "code TEXT PRIMARY KEY, url TEXT NOT NULL, visits INTEGER NOT NULL DEFAULT 0)"
+        )
+        row = conn.execute(
+            "SELECT code, url, visits FROM links WHERE code = ?", (code,)
+        ).fetchone()
+    if row is None:
+        return jsonify({"error": "not found"}), 404
+    return jsonify({"code": row[0], "url": row[1], "visits": row[2]}), 200
