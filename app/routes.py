@@ -3,7 +3,7 @@ import sqlite3
 import string
 from urllib.parse import urlparse
 
-from flask import current_app, jsonify, redirect, request
+from flask import current_app, jsonify, redirect, request, url_for
 
 _ALPHABET = string.ascii_letters + string.digits
 
@@ -38,7 +38,8 @@ def create_link():
         )
         conn.commit()
 
-    return jsonify({"code": code, "url": url}), 201
+    short_url = url_for("redirect_code", code=code, _external=True)
+    return jsonify({"code": code, "url": url, "short_url": short_url}), 201
 
 
 def redirect_code(code):

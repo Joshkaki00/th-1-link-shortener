@@ -34,6 +34,8 @@ def test_ac1_create_short_link(tmp_path):
     assert isinstance(code, str)
     assert code
     assert code != EXAMPLE_URL
+    assert data.get("short_url", "").endswith(f"/{code}")
+    assert data["short_url"].startswith("http")
 
 
 def test_ac2_redirect(tmp_path):

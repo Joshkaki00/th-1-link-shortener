@@ -5,7 +5,7 @@ Flask + SQLite API: shorten a URL, redirect by code (counting visits), and read 
 | Method | Path | Behavior |
 |--------|------|----------|
 | `GET` | `/` or `/health` | Liveness → `200` + `{"status":"ok"}` |
-| `POST` | `/links` | Body `{"url": "https://..."}` → `201` + `code`, `url` |
+| `POST` | `/links` | Body `{"url": "https://..."}` → `201` + `code`, `url`, `short_url` |
 | `GET` | `/<code>` | `302` to original URL; increments `visits` |
 | `GET` | `/links/<code>/stats` | `200` + `code`, `url`, `visits` (no increment) |
 
@@ -37,7 +37,7 @@ curl -s http://127.0.0.1:5000/health
 curl -s -X POST http://127.0.0.1:5000/links \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://en.wikipedia.org/wiki/URL_shortening"}'
-# → {"code":"Ab12Cd34","url":"https://en.wikipedia.org/wiki/URL_shortening"}
+# → {"code":"Ab12Cd34","url":"https://en.wikipedia.org/wiki/URL_shortening","short_url":"http://127.0.0.1:5000/Ab12Cd34"}
 
 # Redirect (follow with -L, or inspect headers)
 curl -sI http://127.0.0.1:5000/Ab12Cd34
