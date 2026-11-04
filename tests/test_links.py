@@ -93,3 +93,14 @@ def test_ac5_unknown_redirect_404(tmp_path):
 
     response = client.get("/nope")
     assert response.status_code == 404
+
+
+def test_ac6_unknown_stats_404(tmp_path):
+    """AC6: GET /links/nope/stats with no mapping → 404."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    response = client.get("/links/nope/stats")
+    assert response.status_code == 404
