@@ -152,3 +152,18 @@ def test_ac8_persist_across_restart(tmp_path):
     response = client2.get(f"/{code}")
     assert response.status_code in (301, 302)
     assert response.headers["Location"] == EXAMPLE_URL
+
+
+def test_ac9_unique_codes(tmp_path):
+    """AC9: two creates → distinct codes."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    first = client.post("/links", json={"url": "https://example.com/one"})
+    second = client.post("/links", json={"url": "https://example.com/two"})
+
+    assert 200 <= first.status_code < 300
+    assert 200 <= second.status_code < 300
+    assert first.get_json()["code"] != second.get_json()["code"]
