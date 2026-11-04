@@ -3,6 +3,19 @@
 EXAMPLE_URL = "https://example.com/path"
 
 
+def test_health(tmp_path):
+    """GET / and GET /health → 200 + status ok."""
+    from app import create_app
+
+    app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "test.sqlite")})
+    client = app.test_client()
+
+    for path in ("/", "/health"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.get_json() == {"status": "ok"}
+
+
 def test_ac1_create_short_link(tmp_path):
     """AC1: POST /links with valid URL → 2xx + non-empty code ≠ full URL."""
     from app import create_app
