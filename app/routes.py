@@ -3,7 +3,7 @@ import sqlite3
 import string
 from urllib.parse import urlparse
 
-from flask import current_app, jsonify, request
+from flask import current_app, jsonify, redirect, request
 
 _ALPHABET = string.ascii_letters + string.digits
 
@@ -34,3 +34,24 @@ def create_link():
         conn.commit()
 
     return jsonify({"code": code, "url": url}), 201
+
+
+def redirect_code(code):
+    """GET /<code> — redirect to original URL and increment visits (AC2)."""
+    db_path = current_app.config["DATABASE"]
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS links ("
+            "code TEXT PRIMARY KEY, url TEXT NOT NULL, visits INTEGER NOT NULL DEFAULT 0)"
+        )
+        row = conn.execute(
+            "SELECT url FROM links WHERE code = ?", (code,)
+        ).fetchone()
+        if row is None:
+            return jsonify({"error": "not found"}), 404
+        conn.execute(
+            "UPDATE links SET visits = visits + 1 WHERE code = ?", (code,)
+        )
+        conn.commit()
+        url = row[0]
+    return redirect(url, code=302)
