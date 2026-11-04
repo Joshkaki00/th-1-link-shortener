@@ -11,6 +11,8 @@ Flask + SQLite API: shorten a URL, redirect by code (counting visits), and read 
 
 Invalid/missing URLs → `4xx`. Unknown codes → `404`.
 
+**Time spent:** 35 minutes. Scoped to a small API-only MVP (no frontend) under the 3–4 hour take-home budget.
+
 ## Quickstart
 
 ```bash
