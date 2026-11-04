@@ -4,6 +4,7 @@ Flask + SQLite API: shorten a URL, redirect by code (counting visits), and read 
 
 | Method | Path | Behavior |
 |--------|------|----------|
+| `GET` | `/` or `/health` | Liveness → `200` + `{"status":"ok"}` |
 | `POST` | `/links` | Body `{"url": "https://..."}` → `201` + `code`, `url` |
 | `GET` | `/<code>` | `302` to original URL; increments `visits` |
 | `GET` | `/links/<code>/stats` | `200` + `code`, `url`, `visits` (no increment) |
@@ -28,6 +29,10 @@ pytest
 ## Example requests
 
 ```bash
+# Health
+curl -s http://127.0.0.1:5000/health
+# → {"status":"ok"}
+
 # Create
 curl -s -X POST http://127.0.0.1:5000/links \
   -H 'Content-Type: application/json' \

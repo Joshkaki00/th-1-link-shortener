@@ -8,6 +8,11 @@ from flask import current_app, jsonify, redirect, request
 _ALPHABET = string.ascii_letters + string.digits
 
 
+def health():
+    """GET / and GET /health — liveness."""
+    return jsonify({"status": "ok"}), 200
+
+
 def create_link():
     """POST /links — validate URL, store mapping, return short code (AC1)."""
     payload = request.get_json(silent=True) or {}
